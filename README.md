@@ -61,4 +61,3 @@ The `User` class represents a user in the marketplace system. It provides functi
 
 5. Manage the user's shopping cart using the `m_cart` vector and the associated `Product` objects.
 
-Note: This documentation provides an overview of the `User` class's interface and functionality. Ensure that you have implemented the class methods correctly based on your specific requirements and logic.
