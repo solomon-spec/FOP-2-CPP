@@ -10,6 +10,7 @@ public:
 	static int getInt(int min, int max);
 	static float getFloat();
 	static int mainMenu();
+	static std::string UUID();
 	static std::vector<std::string> split(std::string str, char delimiter);
 
 };

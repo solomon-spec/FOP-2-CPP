@@ -17,6 +17,9 @@ public:
 	// add a product to the cart
 	void addToCart(Product&);
 
+	// add to cart without message
+	void addToCartWithoutMessage(Product&);
+
 	// register a new customer
 	static void registerCustomer(std::vector<User*>&);
 

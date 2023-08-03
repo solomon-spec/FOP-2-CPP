@@ -6,8 +6,6 @@ class Product
 {
 private:
 
-	// a static variable to generate unique id for each product
-	static int m_idGenerator;
 
 	//name of the product
 	std::string m_name;
@@ -26,7 +24,9 @@ private:
 public:
 
 	// the constructor
-	Product(const std::string, const std::string&, const double&, const int&);
+	Product(const std::string&, const std::string&, const double&, const int&);
+	// product with id
+	Product(const std::string&, const std::string&, const std::string&, const double&, const int&);
 
 	// funcrions to get private members
 	std::string getName();
