@@ -1,4 +1,5 @@
 #include "Customer.h"
+#include "Data.h"
 
 Customer::Customer(const std::string& name, const std::string& fatherName, const std::string& userName,
     const std::string& password): User(name, fatherName, userName, password, false) {}
@@ -61,7 +62,7 @@ int Customer::myCart() {
         if (choice == 0) return 2;
         else if (choice == 1) {
             // add order to data
-            Order::makeOrder(m_cart,m_userName);
+            Order::makeOrder(m_cart,m_userName,Data::orders);
             std::cout << "Order placed successfully" << std::endl;
             Sleep(1000);
             return 2;
@@ -90,6 +91,10 @@ void Customer::addToCart(Product& product) {
     m_cart.push_back(product);
     std::cout << "Item added successfully" << std::endl;
     system("pause");
+}
+
+void Customer::addToCartWithoutMessage(Product& product) {
+	m_cart.push_back(product);
 }
 
 std::vector<Product> Customer::getCart() {

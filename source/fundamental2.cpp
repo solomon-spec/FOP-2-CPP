@@ -5,9 +5,7 @@
 #include "Customer.h"
 #include "Data.h"
 
-using namespace std;
-std::vector<User*> users;
-std::vector<Product*> products;
+
 /*
 1. main menu
 2. user menu 
@@ -36,47 +34,41 @@ void setInitialAppState(User* &user, int &menu, bool &isAdmin, bool &isLoggedIn)
 }
 
 int main()
-{
-    for (int i = 1; i <= 10; i++) {
-        std::string name = "Customer " + std::to_string(i);
-        std::string userName = "user" + std::to_string(i);
-        std::string password = "pass" + std::to_string(i);
-        User* customer = new Customer(name, "Father Name", userName, password);
-        for (int j = 0; j < 5; j++) {
-            Product product = Product("Product_" + std::to_string(j), "category_" + std::to_string(j), j * 10.1, j * 2);
-            dynamic_cast<Customer*>(customer)->addToCart(product);
-        }
-        users.push_back(customer);
-    }
-    // create 10 products
-    for (int i = 1; i<= 10; i++) {
-		std::string name = "Product_" + std::to_string(i);
-        std::string category = "category_" + std::to_string(i);
-		double price = i * 10.1;
-        int quantity = i * 2;
-		Product* product = new Product(name,category, price, quantity);
-		products.push_back(product);
-	}
-    users.push_back(new Admin("sol", "sol", "sol", "sol"));
-    Data::writeUsers(users);
+{   
+    //read data from files
+    Data::readUsers();
+    Data::readProducts();
+    Data::readOrders();
+ 
     User* user = nullptr; // this will hold the current user
     int menu = 1; // this will hold the current menu
     bool isLoggedIn = false; 
     bool isAdmin = false;
 
     while (true) {
+        if (menu == -1) {
+            Data::writeUsers();
+            Data::writeProducts();
+            Data::writeOrders();
+            Utils::exitProgam();
+          
+        }
         if(!isLoggedIn || menu == 1) {
+
 
             // reset the state of the program to the initial state
             setInitialAppState(user, menu, isAdmin, isLoggedIn);
-
+            // save data to files
+            Data::writeUsers();
+            Data::writeProducts();
+            Data::writeOrders();
 
 			menu = Utils::mainMenu();
             switch (menu) {
 
             case 6:
                 std::cout<<"loging you as customer"<<std::endl;
-                user = User::login(users);
+                user = User::login(Data::users);
                 if(user != nullptr) {
 					isLoggedIn = true;
 					isAdmin = false;
@@ -86,7 +78,7 @@ int main()
 
             case 7:
                 std::cout<<"loging you as admin"<<std::endl;
-                user = User::login(users);
+                user = User::login(Data::users);
                 if (user != nullptr && !user->isAdminUser()) {
                     std::cout << "sorry you are not an admin";
                     system("pause");
@@ -101,11 +93,11 @@ int main()
 
             case 8:
                 std::cout<<"registering you as customer" << std::endl;
-				Customer::registerCustomer(users);
+				Customer::registerCustomer(Data::users);
                 break;
             case 9:
                 std::cout<<"registering you as admin" << std::endl;
-                Admin::registerAdmin(users);
+                Admin::registerAdmin(Data::users);
                 break;
             }
 
@@ -126,17 +118,17 @@ int main()
 				    menu = dynamic_cast<Customer*>(user)->myCart();
 			    }
 			    else {
-				    cout << "You are not a customer" << endl;
+				    std::cout << "You are not a customer" << std::endl;
 				    menu = 2;
 			    }
                 break;
             case 5:
-                Product::viewAllProduct(products);
+                Product::viewAllProduct(Data::products);
                 menu = 2;
                 break;
             case 10:
                 if (dynamic_cast<Customer*>(user) != nullptr) {
-					Product* product = Product::getProduct(products);
+					Product* product = Product::getProduct(Data::products);
                     if (product != nullptr) {
 						dynamic_cast<Customer*>(user)->addToCart(*product);
                         menu = 4;
@@ -144,58 +136,63 @@ int main()
                     menu = 2;
 				}
 				else {
-					cout << "You are not a customer" << endl;
+					std::cout << "You are not a customer" << std::endl;
 					menu = 2;
 				}
 				break;
             case 11:
                 if (isAdmin) {
-                    menu = dynamic_cast<Admin*>(user)->addProduct(products);
+                    menu = dynamic_cast<Admin*>(user)->addProduct(Data::products);
                 }
 				else {
-					cout << "You are not an admin" << endl;
+					std::cout << "You are not an admin" << std::endl;
                     menu = 2;
 				}
                 break;
             case 12:
                 if (isAdmin) {
-                    menu = dynamic_cast<Admin*>(user)->deleteProduct(products);
+                    menu = dynamic_cast<Admin*>(user)->deleteProduct(Data::products);
                 }
                 else {
-                    cout << "You are not an admin" << endl;
+                    std::cout << "You are not an admin" << std::endl;
                     menu = 2;
                 }
                 break;
             case 13:
                 if (isAdmin) {
-					menu = dynamic_cast<Admin*>(user)->editProduct(products);
+					menu = dynamic_cast<Admin*>(user)->editProduct(Data::products);
 				}
 				else {
-					cout << "You are not an admin" << endl;
+					std::cout << "You are not an admin" << std::endl;
 					menu = 2;
 				}
 				break;
 			case 14:
                 if (isAdmin) {
-                	for(int i = 0; i < users.size(); i++) {
-						if(dynamic_cast<Customer*>(users[i]) != nullptr) {
-                            cout<<dynamic_cast<Customer*>(users[i])->getUserName()<<std::endl;
+                	for(int i = 0; i < Data::users.size(); i++) {
+						if(dynamic_cast<Customer*>(Data::users[i]) != nullptr) {
+                            std::cout<<dynamic_cast<Customer*>(Data::users[i])->getUserName()<<std::endl;
 						}
 					}
                     system("pause");
                     menu = 2;
                 }
                 else {
-                    cout << "You are not an admin" << endl;
+                    std::cout << "You are not an admin" << std::endl;
                     menu = 2;
                 }
                 break;
             case 15:
                 if(isAdmin){
-                    std::cout << "this is an order" << std::endl;
-					for(int i = 0; i < Order::orders.size(); i++) {
-						std::cout<<"this is an order"<<std::endl;
+                    for (int i = 0; i < Data::orders.size(); i++) {
+						std::cout<< Data::orders[i]->orderToString() << std::endl;
 					}
+					system("pause");
+					menu = 2;
+				}
+				else {
+					std::cout << "You are not an admin" << std::endl;
+					menu = 2;
 				}
                 break;
         }

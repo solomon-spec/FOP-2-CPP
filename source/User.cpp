@@ -68,14 +68,14 @@ int User::displayMenu() {
         std::cout<<"6. Exit"<<std::endl;
         std::cout << "Enter your choice: ";
         int choice;
-        choice = Utils::getInt(1, 5);
+        choice = Utils::getInt(1, 6);
         switch (choice){
             case 1:return 5;
             case 2:return 4;
             case 3:return 3;
             case 4:return 10;
             case 5:return 1;
-            case 6:Utils::exitProgam();
+            case 6: return -1;
         }
 
     }

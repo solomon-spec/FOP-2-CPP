@@ -1,16 +1,24 @@
 #include "Product.h"
 #include "utils.h"
 
-
-int Product::m_idGenerator = 1;
-Product::Product(const std::string name, const std::string& categort, const double& price , const int& quantity)
+// new product without id
+Product::Product(const std::string& name, const std::string& categort, const double& price , const int& quantity)
 {
 	m_name = name;
-	m_id = "product"+ std::to_string(m_idGenerator);
+	m_id = Utils::UUID();
 	m_category = categort;
 	m_price = price;
 	m_quantity = quantity;
-	m_idGenerator++;
+
+}
+// product with id
+Product::Product(const std::string& id, const std::string& name, const std::string& categort, const double& price, const int& quantity)
+{
+	m_name = name;
+	m_id = id;
+	m_category = categort;
+	m_price = price;
+	m_quantity = quantity;
 
 }
 
@@ -70,14 +78,14 @@ void Product::setQuantity(const int& quantity)
 
 void Product::print()
 {
-	std::cout << " ID: " << m_id <<"Name: "<<m_name<<" Category: "<<m_category<<" Price:"<<m_price<<" Birr"<<" Available Quantity: "<<m_quantity<<std::endl;
+	std::cout << " ID: " << m_id <<" Name: "<<m_name<<" Category: "<<m_category<<" Price: "<<m_price<<"Birr"<<" Available Quantity: "<<m_quantity<<std::endl;
 }
 
 void Product::viewAllProduct(std::vector<Product*> products)
 {
 	for (int i = 0; i < products.size(); i++)
 	{
-		std::cout << i << ". ";
+		std::cout << i + 1 << ". ";
 		products[i]->print();
 		std::cout << std::endl;
 	}
@@ -88,7 +96,7 @@ Product* Product::getProduct(std::vector<Product*> products){
 
 	for (long unsigned int i = 1; i <= products.size(); i++)
 	{
-		std::cout << i+1 << ". ";
+		std::cout << i << ". ";
 		products[i-1]->print();
 		std::cout << std::endl;
 	}
@@ -102,6 +110,6 @@ Product* Product::getProduct(std::vector<Product*> products){
 
 std::string Product::productToString()
 {
-	std::string productString = m_name + "," + m_id + "," + m_category + "," + std::to_string(m_price) + "," + std::to_string(m_quantity);
+	std::string productString =  m_id+ "," + m_name + "," + m_category + "," + std::to_string(m_price) + "," + std::to_string(m_quantity);
 	return productString;
 }

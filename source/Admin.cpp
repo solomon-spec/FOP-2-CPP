@@ -55,8 +55,8 @@ int Admin::displayMenu() {
         case 4: return 5;
         case 5: return 14;
         case 6: return 15;
-        case 7: return 2;
-        case 8: Utils::exitProgam();
+        case 7: return 1;
+        case 8: return -1;
     }
 
 

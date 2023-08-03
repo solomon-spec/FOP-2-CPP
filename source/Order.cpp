@@ -1,21 +1,28 @@
-#include "Order.h"
-int Order::m_idGenerator = 1;	
-std::vector<Order*> Order::orders = {};
+#include "Order.h"	
 
 Order::Order(std::string username, std::vector<Product*> products) {
-	m_orderId = m_idGenerator++;
-	std::string m_customerUsername;
+	m_orderId = Utils::UUID();
+	m_customerUsername = username;
 	m_products = products;
+	m_orderDate = std::time(0);
  }
-
-void Order::makeOrder(std::vector<Product>& products, std::string username) {
+// order with id
+Order::Order(std::string id, std::string username, std::vector<Product*> products,std::time_t time) {
+	m_orderId = id;
+	m_customerUsername = username;
+	m_products = products;
+	m_orderDate = time;
+}
+void Order::makeOrder(std::vector<Product>& products, std::string username, std::vector<Order*>& tot_orders) {
 	//  products vector to product * vector
+
 	std::vector<Product*> productsPtr;
 	for (int i = 0; i < products.size(); i++) {
 		productsPtr.push_back(&products[i]);
 	}
-	Order order(username, productsPtr);
-	Order::orders.push_back(&order);
+	Order* order = new Order(username, productsPtr);
+	tot_orders.push_back(order);
+
 	products = {};
 
 
@@ -39,5 +46,6 @@ std::vector<Product*> Order::getProducts() {
 }
 
 std::string Order::orderToString() {
-	return m_customerUsername;	
+	std::string result = m_orderId + "," + m_customerUsername + "," + std::to_string(m_orderDate);
+	return result;
 }

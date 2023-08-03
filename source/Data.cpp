@@ -1,20 +1,24 @@
 #include "Data.h"
 
 // define static vectors
-std::vector<User*> Data::m_users = {};
-std::vector<Product*> Data::m_products = {};
-std::vector<Order*> Data::m_orders = {};
+std::vector<User*> Data::users = {};
+std::vector<Product*> Data::products = {};
+std::vector<Order*> Data::orders = {};
 
 std::vector<User*> Data::readUsers() {
+
 	// open the file
 	std::ifstream file("users.txt");
+
 	// if the file is not open, print an error message and return
 	if (!file.is_open()) {
 		std::cout << "Error opening file" << std::endl;
 		return {};
 	}
+
 	// while there is a line in the file read the users 
 	std::string line;
+
 	while (std::getline(file, line)) {
 
 		// split the line into tokens
@@ -27,7 +31,7 @@ std::vector<User*> Data::readUsers() {
 			Admin* admin = new Admin(tokens[1], tokens[2], tokens[3], tokens[4]);
 
 			// add the admin to the vector
-			m_users.push_back(admin);
+			users.push_back(admin);
 		}
 
 		// if the user is a customer
@@ -37,26 +41,26 @@ std::vector<User*> Data::readUsers() {
 			Customer* customer = new Customer(tokens[1], tokens[2], tokens[3], tokens[4]);
 
 			// add the customer to the vector
-			m_users.push_back(customer);
+			users.push_back(customer);
 		}
 		// if it is a product
 		else if (tokens[0] == "product") {
 
 			// get the customer last added to the vector
-			Customer* customer = (Customer*)m_users[m_users.size() - 1];
+			Customer* customer = (Customer*)users[users.size() - 1];
 
 			// create a new product
-			Product product = Product(tokens[1], customer->getUserName(), std::stod(tokens[2]), std::stoi(tokens[3]));
+			Product product = Product(tokens[1], tokens[2],tokens[3], std::stod(tokens[4]), std::stoi(tokens[5]));
 
 			// add product to customer cart
-			customer->addToCart(product);
+			customer->addToCartWithoutMessage(product);
 		}
 	}
 
 	// close the file
 	file.close();
 	// return the vector
-	return m_users;
+	return users;
 }
 // read products from file
 std::vector<Product*> Data::readProducts(){
@@ -72,19 +76,22 @@ std::vector<Product*> Data::readProducts(){
 
 	// while there is a line in the file read the products
 	std::string line;
+
 	while (std::getline(file, line)) {
 
 		// split the line into tokens
 		std::vector<std::string> tokens = Utils::split(line, ',');
 
 		// create a new product
-		Product* product = new Product(tokens[0], tokens[1], std::stod(tokens[2]), std::stoi(tokens[3]));
+		Product* product = new Product(tokens[0],tokens[1], tokens[2], std::stod(tokens[3]), std::stoi(tokens[4]));
 
-		// add the product to the vector
-		m_products.push_back(product);
+		// add the product to the vector 
+		products.push_back(product);
+
 	}
+
 	file.close();
-	return m_products;
+	return products;
 
 }
 
@@ -99,28 +106,28 @@ std::vector<Order*> Data::readOrders() {
 	while (std::getline(file, line)) {
 		std::vector<std::string> tokens = Utils::split(line, ',');
 		if (tokens[0] == "order") {
-			Data::m_orders.push_back(new Order(tokens[1], {}));
+			std::time_t date = std::stol(tokens[3]);
+			orders.push_back(new Order(tokens[1],tokens[2], {},date));
 		}
 		else if (tokens[0] == "product") {
-			Product product = Product(tokens[1], tokens[2], std::stod(tokens[3]), std::stoi(tokens[4]));
-			Data::m_orders[m_orders.size() - 1]->addProduct(product);
+			Product product = Product(tokens[1], tokens[2], tokens[3], std::stod(tokens[4]), std::stoi(tokens[5]));
+			orders[orders.size() - 1]->addProduct(product);
 		}
 	}
 	file.close();
-	return m_orders;
+	return orders;
 
 }
 
 // write users to file
-void Data::writeUsers(std::vector<User*>& users) {
-	std::ofstream file("users.txt");
+void Data::writeUsers() {
+	std::ofstream file;
+	file.open("users.txt", std::ofstream::out | std::ofstream::trunc);
 	if (!file.is_open()) {
-		std::cout << "Error opening file" << std::endl;
+		std::cout << "Error opening file to write users" << std::endl;
 		system("pause");
 		return;
 	}
-	// clear the file
-	file.clear();
 	for (User* user : users) {
 		file << user->userToString() << std::endl;
 		if (dynamic_cast<Customer*>(user)) {
@@ -131,14 +138,13 @@ void Data::writeUsers(std::vector<User*>& users) {
 		}
 	}
 	file.close();
-	std::cout<<"Users saved"<<std::endl;
-	system("pause");
 }
 
 
 // write products to file
-void Data::writeProducts(std::vector<Product*>& products) {
-	std::ofstream file("products.txt");
+void Data::writeProducts() {
+	std::ofstream file;
+	file.open("products.txt", std::ofstream::out | std::ofstream::trunc);
 	if (!file.is_open()) {
 		std::cout << "Error opening file" << std::endl;
 		return;
@@ -152,8 +158,9 @@ void Data::writeProducts(std::vector<Product*>& products) {
 }
 
 // write orders to file
-void Data::writeOrders(std::vector<Order*>& orders) {
-	std::ofstream file("orders.txt");
+void Data::writeOrders() {
+	std::ofstream file;
+	file.open("orders.txt", std::ofstream::out | std::ofstream::trunc);
 	if (!file.is_open()) {
 		std::cout << "Error opening file" << std::endl;
 		return;
@@ -161,7 +168,7 @@ void Data::writeOrders(std::vector<Order*>& orders) {
 	// clear the file
 	file.clear();
 	for (Order* order : orders) {
-		file << order->orderToString() << std::endl;
+		file << "order,"+order->orderToString() << std::endl;
 		for (Product* product : order->getProducts()) {
 			file <<"product," + product->productToString() << std::endl;
 		}
